@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import instance from "../../components/auth/axiosConfig";
 import Container from "../../components/Container";
 import { useNavigate } from "react-router-dom";
+import EmptyMessage from "../../components/common/EmptyMessage";
 
 const List = () => {
   const [loading, setLoading] = useState(false);
@@ -16,14 +17,14 @@ const List = () => {
       });
   }, []);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
     <>
       <Container>
         <div className="row">
-          <div className="col-lg-6 col-md-7 col-sm-12 mx-auto">
+          <div className="col-lg-8 col-md-7 col-sm-12 mx-auto">
             <div class="table-responsive">
-              <table class="table table-bordered mt-2 fw-9">
+              <table class="table mt-2 fw-9">
                 <thead>
                   <tr>
                     <th scope="col">#</th>
@@ -50,9 +51,21 @@ const List = () => {
                       //   console.log(clas);
                       return (
                         <>
-                          <tr key={index} onClick={()=>navigate(`/classes/view/${clas?.id}`, {state:clas?.id})}>
+                          <tr
+                            key={index}
+                            onClick={() =>
+                              navigate(`/classes/view/${clas?.id}`, {
+                                state: clas?.id,
+                              })
+                            }
+                          >
                             <td>{index + 1}</td>
-                            <td style={{cursor:"pointer"}} className="text-decoration-underline">{clas?.program?.name}</td>
+                            <td
+                              style={{ cursor: "pointer" }}
+                              className="text-decoration-underline"
+                            >
+                              {clas?.program?.name}
+                            </td>
                             <td>{clas?.availableSpace}</td>
                             <td>{clas?.instructor?.person?.firstName}</td>
                           </tr>
@@ -60,8 +73,10 @@ const List = () => {
                       );
                     })
                   ) : (
-                    <tr className="border text-center w-100">
-                      {/* <EmptyMessage title="preferences" className="w-100" /> */}
+                    <tr className=" text-center">
+                      <td colspan="4">
+                        <EmptyMessage title="classes" className="" />
+                      </td>{" "}
                     </tr>
                   )}
                 </tbody>
