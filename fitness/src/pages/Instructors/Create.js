@@ -4,27 +4,28 @@ import Input from "../../components/common/Input";
 import instance from "../../components/auth/axiosConfig";
 import Select from "../../components/common/Select";
 import Button from "../../components/common/Button";
+import { useNavigate } from "react-router-dom";
+import { returnTimeOut, userDetail } from "../../components/helpers/common";
+import Message from "../../components/common/Message";
 
 const Create = () => {
   const [locations, setLocations] = useState([]);
   const [programs, setPrograms] = useState([]);
-
-  function uniqueById(items) {
-    const set = new Set();
-    return items.filter((item) => {
-      const isDuplicate = set.has(item);
-      set.add({ value: item?.id, label: item?.value });
-      return !isDuplicate;
-    });
-  }
+  const [data, setData] = useState({});
+  const [message, setMessage] = useState({
+    success: false,
+    error: false,
+    message: "",
+  });
 
   useEffect(() => {
     instance
       .get("data/programs")
       .then((res) => {
         if (res) {
-          const unique = [...new Map(res?.data.map((m) => [m.id, m])).values()];
-
+          const unique = [
+            ...new Map(res?.data.map((m) => [m.programId, m])).values(),
+          ];
           setPrograms(unique);
         }
       })
@@ -36,15 +37,74 @@ const Create = () => {
     instance
       .get("data/locations")
       .then((res) => {
-        const unique = [...new Map(res?.data.map((m) => [m.id, m])).values()];
-
+        const unique = [
+          ...new Map(res?.data.map((m) => [m.locationId, m])).values(),
+        ];
         setLocations(unique);
-        //   console.log(res);
       })
       .catch((err) => {
         console.log(err);
       });
   }, []);
+
+  const onChange = (e) => {
+    const { name, value } = e?.target;
+    let formData = { ...data };
+    formData[name] = value;
+    setData(formData);
+  };
+
+  const navigate = useNavigate();
+
+  let detail = JSON.parse(userDetail)
+  // console.log(JSON.parse(userDetail))
+  const onSubmit = (e) =>{
+    e?.preventDefault()
+    let formData = {...data}
+    formData['instructor'] = {
+      'personId' : parseInt(detail?.id)
+    }
+
+    formData['program'] = {
+      'programId' : parseInt(formData?.programId)
+    }
+
+    formData['location'] = {
+      'locationId' : parseInt(formData?.locationId)
+    }
+
+    delete formData?.locationId
+    delete formData?.programId
+
+    // formData['instructorId'] = parseInt(detail?.id)
+    // formData['programId'] = parseInt(formData?.programId)
+    // formData['locationId'] = parseInt(formData?.locationId)
+    formData['totalCapacity'] = parseInt(formData?.totalCapacity)
+
+    instance.post('data/classes', formData)
+    .then((res)=>{
+      // console.log(res)
+      setTimeout(()=>{
+        navigate("/instructors/class");
+        window?.location?.reload()
+      },[100])
+      setMessage({
+        success: false,
+        error: true,
+        message: "Class Created Successfully",
+      });
+    }).catch((err)=>{
+      setMessage({
+        success: false,
+        error: true,
+        message: err?.response?.data?.errorMessage,
+      });
+      console.log(err)
+    })
+   
+    returnTimeOut(setMessage)
+  }
+
   return (
     <>
       <Container>
@@ -52,19 +112,28 @@ const Create = () => {
           <div className="col-lg-6 col-md-6 col-sm-12 mx-auto">
             <form className="form-container p-3 rounded">
               <h6 className="fw-bold fw-9">Create a new class</h6>
+              <Message success={message?.success} error={message?.error} message={message?.message}/>
 
               <div>
                 <label class="form-label text-muted mb-0 text-capitalize fw-bold">
                   Select the Program
                 </label>
-                <Select options={programs} />
+                <Select
+                  options={programs}
+                  name="programId"
+                  onChange={onChange}
+                />
               </div>
 
               <div className="mt-2">
                 <label class="form-label text-muted mb-0 text-capitalize fw-bold">
                   Select the Location
                 </label>
-                <Select options={locations} />
+                <Select
+                  options={locations}
+                  name="locationId"
+                  onChange={onChange}
+                />
               </div>
 
               <Input
@@ -73,6 +142,7 @@ const Create = () => {
                 id="startTime"
                 label={true}
                 className="mt-2"
+                onChange={onChange}
               />
 
               <Input
@@ -80,6 +150,15 @@ const Create = () => {
                 name="endTime"
                 id="endTime"
                 label={true}
+                onChange={onChange}
+              />
+
+              <Input
+                type="number"
+                name="totalCapacity"
+                id="totalCapacity"
+                label={true}
+                onChange={onChange}
               />
 
               <div className="mt-3">
@@ -89,7 +168,7 @@ const Create = () => {
                   className="mt-2"
                   color="black"
                   textColor="white"
-                  //   onClick={onSubmit}
+                    onClick={onSubmit}
                   //   disabled={loading}
                 />
               </div>

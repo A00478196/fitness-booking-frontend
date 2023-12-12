@@ -4,15 +4,21 @@ import Container from "../../components/Container";
 import SectionHeader from "../../components/common/SectionHeader";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/common/Button";
+import { userDetail } from "../../components/helpers/common";
+import EmptyMessage from "../../components/common/EmptyMessage";
 
 const List = () => {
   const [loading, setLoading] = useState(false);
   const [allClasses, setAllClasses] = useState([]);
   const id = 1;
   const navigate = useNavigate();
+  let detail = JSON.parse(userDetail);
+
   useEffect(() => {
     instance
-      .get(`/data/instructors/${id}/classes`)
+      .get(`data/instructors/${detail?.id}/classes`, {
+        instructorId: 3,
+      })
       .then((res) => {
         setAllClasses(res?.data);
         console.log(res);
@@ -103,8 +109,10 @@ const List = () => {
                       );
                     })
                   ) : (
-                    <tr className="border text-center w-100">
-                      {/* <EmptyMessage title="preferences" className="w-100" /> */}
+                    <tr className=" text-center">
+                      <td colspan="5">
+                        <EmptyMessage title="classes" className="" />
+                      </td>{" "}
                     </tr>
                   )}
                 </tbody>
