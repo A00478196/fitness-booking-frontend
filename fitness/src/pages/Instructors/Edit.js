@@ -4,11 +4,11 @@ import Input from "../../components/common/Input";
 import instance from "../../components/auth/axiosConfig";
 import Select from "../../components/common/Select";
 import Button from "../../components/common/Button";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { returnTimeOut, userDetail } from "../../components/helpers/common";
 import Message from "../../components/common/Message";
 
-const Create = () => {
+const Edit = () => {
   const [locations, setLocations] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [data, setData] = useState({});
@@ -18,17 +18,10 @@ const Create = () => {
     message: "",
   });
 
-  let detail = JSON.parse(userDetail);
+  const location = useLocation()
+  const id = location?.state
 
   useEffect(() => {
-    instance
-      .get(`data/instructors/${detail?.id}`)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
     instance
       .get("data/programs")
       .then((res) => {
@@ -64,57 +57,63 @@ const Create = () => {
     setData(formData);
   };
 
+  useEffect(()=>{
+    instance.get(`data/classes/${id?.id}`)
+    .then((res)=>{
+        setData(res?.data)
+        // console.log(res)
+    }).catch((err)=>{
+        console.log(err)
+    })
+  },[])
+
   const navigate = useNavigate();
 
+  let detail = JSON.parse(userDetail)
   // console.log(JSON.parse(userDetail))
-  const onSubmit = (e) => {
-    e?.preventDefault();
-    let formData = { ...data };
-    formData["instructor"] = {
-      personId: parseInt(detail?.id),
-    };
+  const onSubmit = (e) =>{
+    e?.preventDefault()
+    let formData = {...data}
+    formData['instructor'] = {
+      'personId' : parseInt(detail?.id)
+    }
 
-    formData["program"] = {
-      programId: parseInt(formData?.programId),
-    };
+    formData['program'] = {
+      'programId' : parseInt(formData?.programId)
+    }
 
-    formData["location"] = {
-      locationId: parseInt(formData?.locationId),
-    };
+    formData['location'] = {
+      'locationId' : parseInt(formData?.locationId)
+    }
 
-    delete formData?.locationId;
-    delete formData?.programId;
+    delete formData?.locationId
+    delete formData?.programId
 
-    // formData['instructorId'] = parseInt(detail?.id)
-    // formData['programId'] = parseInt(formData?.programId)
-    // formData['locationId'] = parseInt(formData?.locationId)
-    formData["totalCapacity"] = parseInt(formData?.totalCapacity);
+    formData['totalCapacity'] = parseInt(formData?.totalCapacity)
 
-    instance
-      .post("data/classes", formData)
-      .then((res) => {
-        // console.log(res)
-        setTimeout(() => {
-          navigate("/instructors/class");
-          // window?.location?.reload()
-        }, [1000]);
-        setMessage({
-          success: true,
-          error: false,
-          message: "Class Created Successfully",
-        });
-      })
-      .catch((err) => {
-        setMessage({
-          success: false,
-          error: true,
-          message: err?.response?.data?.errorMessage,
-        });
-        console.log(err);
+    console.log(formData)
+
+    instance.put(`data/classes/${id?.id}`, formData)
+    .then((res)=>{
+      setTimeout(()=>{
+        navigate("/instructors/class");
+      },[1000])
+      setMessage({
+        success: true,
+        error: false,
+        message: "Class Edited Successfully",
       });
-
-    returnTimeOut(setMessage);
-  };
+    }).catch((err)=>{
+      setMessage({
+        success: false,
+        error: true,
+        message: err?.response?.data?.errorMessage,
+      });
+      console.log(err)
+    })
+   
+    returnTimeOut(setMessage)
+  }
 
   return (
     <>
@@ -123,11 +122,7 @@ const Create = () => {
           <div className="col-lg-6 col-md-6 col-sm-12 mx-auto">
             <form className="form-container p-3 rounded">
               <h6 className="fw-bold fw-9">Create a new class</h6>
-              <Message
-                success={message?.success}
-                error={message?.error}
-                message={message?.message}
-              />
+              <Message success={message?.success} error={message?.error} message={message?.message}/>
 
               <div>
                 <label class="form-label text-muted mb-0 text-capitalize fw-bold">
@@ -137,6 +132,7 @@ const Create = () => {
                   options={programs}
                   name="programId"
                   onChange={onChange}
+                  selected={data?.program?.programId}
                 />
               </div>
 
@@ -148,6 +144,8 @@ const Create = () => {
                   options={locations}
                   name="locationId"
                   onChange={onChange}
+                  selected={data?.location?.locationId}
+
                 />
               </div>
 
@@ -158,6 +156,8 @@ const Create = () => {
                 label={true}
                 className="mt-2"
                 onChange={onChange}
+                value={data?.startTime}
+
               />
 
               <Input
@@ -166,6 +166,8 @@ const Create = () => {
                 id="endTime"
                 label={true}
                 onChange={onChange}
+                value={data?.endTime}
+
               />
 
               <Input
@@ -174,16 +176,18 @@ const Create = () => {
                 id="totalCapacity"
                 label={true}
                 onChange={onChange}
+                value={data?.totalCapacity}
+
               />
 
               <div className="mt-3">
                 <Button
-                  text="Create"
+                  text="Edit"
                   type="main"
                   className="mt-2"
                   color="black"
                   textColor="white"
-                  onClick={onSubmit}
+                    onClick={onSubmit}
                   //   disabled={loading}
                 />
               </div>
@@ -195,4 +199,4 @@ const Create = () => {
   );
 };
 
-export default Create;
+export default Edit;

@@ -5,10 +5,21 @@ import { useNavigate } from "react-router-dom";
 import EmptyMessage from "../../components/common/EmptyMessage";
 import { userDetail } from "../../components/helpers/common";
 import { EachList } from "../programs/Programs";
+import Message from "../../components/common/Message";
 
 const List = () => {
   const [loading, setLoading] = useState(false);
   const [classes, setClasses] = useState([]);
+  const [showModal, setModal] = useState({
+    id: "",
+    showModal: false,
+  });
+
+  const [message, setMessage] = useState({
+    success: false,
+    error: false,
+    message: "",
+  });
 
   let user = userDetail && JSON.parse(userDetail);
 
@@ -22,6 +33,26 @@ const List = () => {
   }, []);
 
   const navigate = useNavigate();
+
+  const dropClass = (e) => {
+    e.preventDefault();
+    instance
+      .delete(`data/persons/drop-class/${user?.id}?classes=${showModal?.id}`)
+      .then((res) => {
+        setMessage({
+          success: true,
+          error: false,
+          message: "Class Dropped Successfully!",
+        });
+        setTimeout(() => {
+          window?.location?.reload();
+        }, 1000);
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <>
       <Container>
@@ -193,29 +224,43 @@ const List = () => {
                                   listData?.instructor?.lastName}
                               </p>
                             </div>
-                            <div
-                              onClick={() =>
-                                navigate(`/classes/view/${listData?.classId}`, {
-                                  state: {
-                                    id: listData?.classId,
-                                    registered:
-                                      listData?.persons.filter(
-                                        (e) => e.personId === user?.id
-                                      ).length > 0
-                                        ? true
-                                        : false,
-                                  },
-                                })
-                              }
-                            >
+                            <div>
                               {listData?.persons.filter(
                                 (e) => e.personId === user?.id
                               ).length > 0 ? (
-                                <span class="badge bg-warning text-dark p-1 py-2">
-                                  Registered
+                                <span
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#deleteModal"
+                                  class="badge bg-warning text-dark p-1 py-2"
+                                  onClick={() =>
+                                    setModal({
+                                      id: listData?.classId,
+                                      showModal: true,
+                                    })
+                                  }
+                                >
+                                  Drop Class
                                 </span>
                               ) : (
-                                <span class="badge bg-dark p-1 py-2">
+                                <span
+                                  class="badge bg-dark p-1 py-2"
+                                  onClick={() =>
+                                    navigate(
+                                      `/classes/view/${listData?.classId}`,
+                                      {
+                                        state: {
+                                          id: listData?.classId,
+                                          registered:
+                                            listData?.persons.filter(
+                                              (e) => e.personId === user?.id
+                                            ).length > 0
+                                              ? true
+                                              : false,
+                                        },
+                                      }
+                                    )
+                                  }
+                                >
                                   Register Now
                                 </span>
                               )}
@@ -236,6 +281,57 @@ const List = () => {
             </div>
           </div>
         </div>
+        {/* {showModal?.showModal && ( */}
+        <div
+          class="modal fade"
+          id="deleteModal"
+          tabindex="-1"
+          aria-labelledby="deleteModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Drop class</h5>
+                <div className="text-start my-3">
+                <Message
+                  success={message?.success}
+                  error={message?.error}
+                  message={message?.message}
+                />
+                </div>
+               
+
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <p>Are you sure you want to drop this class?</p>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  onClick={dropClass}
+                >
+                  Yes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* )} */}
       </Container>
     </>
   );

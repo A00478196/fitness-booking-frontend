@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { loggedUser } from "../helpers/common";
+import { loggedUser, userDetail } from "../helpers/common";
 import instance from "../auth/axiosConfig";
 
 const Navbar = () => {
@@ -10,11 +10,14 @@ const Navbar = () => {
   //   instance.get()
   // },[loggedUser])
 
+  const [user, setUser] = useState({})
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   useEffect(() => {
     const items = JSON.parse(localStorage.getItem("userDetails"));
     if (items) {
       setIsLoggedIn(true);
+      setUser(items)
     }
   }, []);
 
@@ -59,7 +62,7 @@ const Navbar = () => {
                   Home
                 </NavLink>
               </li>
-              {loggedUser === "others" && (
+              { (
                 <li className="nav-item">
                   <NavLink
                     to="/programs"
@@ -113,11 +116,37 @@ const Navbar = () => {
                 </li>
               )}
               {isLoggedIn ? (
-                <li className="nav-item">
-                  <p className="nav-link mb-0" onClick={logout}>
+                <li class="nav-item dropdown ">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  id="navbarDropdown"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {user?.username}
+                </a>
+                <ul
+                  class="dropdown-menu fw-9"
+                  aria-labelledby="navbarDropdown"
+                >
+                  <li className="nav-item">
+                    <NavLink
+                      className={"dropdown-item"}
+                      to="/profile"
+                    >
+                      Profile
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                  <p style={{cursor:"pointer"}} className="nav-link ms-2 mb-0" onClick={logout}>
                     Logout
                   </p>
                 </li>
+                </ul>
+              </li>
+               
               ) : (
                 <>
                   <li className="nav-item">

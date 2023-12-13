@@ -22,10 +22,7 @@ const Input = (props) => {
             for={id}
             class="form-label text-muted mb-0 text-capitalize fw-bold"
           >
-            {
-              name && 
-              regexForLabels(name)
-            }
+            {name && regexForLabels(name)}
           </label>
         )}
 
@@ -33,7 +30,7 @@ const Input = (props) => {
           className="form-control"
           type={type}
           placeholder={placeholder}
-          value={value}
+          value={value || ""}
           name={name}
           id={id}
           disabled={disabled ? disabled : false}

@@ -44,7 +44,7 @@ const View = () => {
       .then((res) => {
         console.log(res);
         navigate("/classes/view");
-        window.location.reload()
+        window.location.reload();
       })
       .catch((err) => {
         console.log(err);
@@ -121,7 +121,6 @@ const View = () => {
                   </div>
                 </div>
               </div>
-              {/* {console.log(insId)} */}
 
               <div className="register mt-3">
                 {insId?.registered === false ? (

@@ -22,7 +22,7 @@ const List = () => {
       })
       .then((res) => {
         setAllClasses(res?.data);
-        console.log(res);
+        // console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -148,24 +148,27 @@ const List = () => {
                               <p className="fw-9">{listData?.location?.name}</p>
                             </div>
                             <div className="fw-9">
-                              <p className="fw-bold m-0 ">
-                                {" "}
-                                {listData?.startTime &&
-                                  new Date(
-                                    listData?.startTime
-                                  )?.toLocaleDateString()}
-                                {/* {listData?.endTime &&
+                              <p className=" fw-bold mb-1">
+                                <span className="me-2">
+                                  {listData?.startTime &&
+                                    new Date(
+                                      listData?.startTime
+                                    )?.toLocaleDateString()}
+                                </span>
+                                -
+                                <span className="ms-2">
+                                  {listData?.endTime &&
                                     new Date(
                                       listData?.endTime
-                                    )?.toLocaleDateString()} */}
+                                    )?.toLocaleDateString()}
+                                </span>
                               </p>
-                              <p>
-                                {" "}
+                              <p class=" text-muted mb-0">
                                 {listData?.startTime &&
                                   new Date(
                                     listData?.startTime
                                   )?.toLocaleTimeString()}{" "}
-                                -{" "}
+                                -
                                 {listData?.endTime &&
                                   new Date(
                                     listData?.endTime
@@ -177,6 +180,7 @@ const List = () => {
                               <p>{listData?.totalCapacity}</p>
                             </div>
                             {loggedUser === "instructor" && (
+                              <div className="d-flex flex-column">
                               <div
                                 className="secondaryBtn"
                                 style={{ cursor: "pointer" }}
@@ -193,6 +197,25 @@ const List = () => {
                                 }
                               >
                                 View Details
+                              </div>
+
+                              <div
+                                className="secondaryBtn mt-2"
+                                style={{ cursor: "pointer" }}
+                                onClick={() =>
+                                  navigate(
+                                    `/classes/edit/${listData?.classId}`,
+                                    {
+                                      state: {
+                                        id: listData?.classId,
+                                        registered: false,
+                                      },
+                                    }
+                                  )
+                                }
+                              >
+                                Edit Details
+                              </div>
                               </div>
                             )}
                           </EachList>

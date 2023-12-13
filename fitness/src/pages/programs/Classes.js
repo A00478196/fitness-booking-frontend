@@ -7,6 +7,7 @@ import EmptyMessage from "../../components/common/EmptyMessage";
 import { FaEye } from "react-icons/fa";
 import { EachList } from "./Programs";
 import { loggedUser, userDetail } from "../../components/helpers/common";
+import Button from "../../components/common/Button";
 
 const Classes = () => {
   const location = useLocation();
@@ -40,6 +41,7 @@ const Classes = () => {
           <div className="col-lg-9 col-md-8 col-sm-12 mx-auto">
             <SectionHeader label={`All Classes offered for `} />{" "}
             <span className="fw-9 headingName">{program?.name}</span>
+            <Button text="Qualify for this program"/>
             {/* <div class="table-responsive">
               <table class="table table-bordered  mt-2 fw-9">
                 <thead>

@@ -77,6 +77,7 @@ const Login = () => {
               label={true}
               placeholder="Enter your username"
               onChange={onChange}
+              value={data?.username}
             />
 
             <Input
@@ -86,6 +87,7 @@ const Login = () => {
               label={true}
               placeholder="Enter your password"
               onChange={onChange}
+              value={data?.password}
             />
 
             <Button

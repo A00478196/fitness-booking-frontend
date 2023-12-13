@@ -17,3 +17,45 @@ export const returnTimeOut = (setMessage) =>{
         })
       },[6000])
 }
+
+export const validateForm = (data, setFormErrors)=>{
+  let errors={}
+  console.log(data)
+  if(data){
+      Object.keys(data)?.map((formD)=>{
+          let key = formD
+          let val = data[formD]
+          if(val!==undefined ){
+              if( val=="" ){
+                  errors[key] = `${formD} is required`
+              }
+          }else{
+              errors[key] = `${formD} is required`
+          }
+      })
+
+    }
+
+  setFormErrors(errors);
+  return Object.keys(errors).length === 0;
+}
+
+export const generalForm = (data, setFormErrors)=>{
+  const errors = {};
+  if(data){
+      Object.keys(data)?.map((formD)=>{
+          let key = formD
+          let val = data[formD]
+
+          if(val!==undefined ){
+              if( val=="" ){
+                  errors[key] = `${formD} is required`
+              }
+          }else{
+              errors[key] = `${formD} is required`
+          }
+      })
+  }
+  setFormErrors(errors);
+  return Object.keys(errors).length === 0;
+}
