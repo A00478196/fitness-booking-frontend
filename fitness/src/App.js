@@ -14,6 +14,7 @@ import ListClass from './pages/Instructors/List'
 import Create from './pages/Instructors/Create';
 import Home from './pages/Home';
 import Programs from './pages/programs/Programs';
+import ProgramClass from './pages/programs/Classes'
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
           <Route exact path='/instructors/class' element={<ListClass />}/>
           <Route exact path='/instructors/class/new' element={<Create />}/>
           <Route exact path='/programs' element={<Programs />}/>
+          <Route exact path="/programs/:id/classes" element={<ProgramClass />}/>
 
         </Routes>
     </>

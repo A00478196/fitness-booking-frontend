@@ -86,11 +86,11 @@ const Create = () => {
       // console.log(res)
       setTimeout(()=>{
         navigate("/instructors/class");
-        window?.location?.reload()
-      },[100])
+        // window?.location?.reload()
+      },[1000])
       setMessage({
-        success: false,
-        error: true,
+        success: true,
+        error: false,
         message: "Class Created Successfully",
       });
     }).catch((err)=>{

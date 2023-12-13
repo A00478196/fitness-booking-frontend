@@ -4,6 +4,8 @@ import instance from "../../components/auth/axiosConfig";
 import SectionHeader from "../../components/common/SectionHeader";
 import Checkbox from "../../components/common/Checkbox";
 import EmptyMessage from "../../components/common/EmptyMessage";
+import { useNavigate } from "react-router-dom";
+import { FaEye } from "react-icons/fa";
 
 const Programs = () => {
   const [loading, setLoading] = useState(false);
@@ -80,39 +82,8 @@ const Programs = () => {
       getPrograms();
     }
   };
-  // const onChange = (e) => {
-  //   let { name, value } = e?.target;
-  //   let checked = e?.target?.checked;
 
-  //   if (checked) {
-  // if (value === "programs") {
-  //   setSelectedCat("programs");
-  //   getPrograms();
-  // } else if (value === "instructors") {
-  //   setSelectedCat("instructors");
-  //   getInstructors();
-  // } else if (value === "locations") {
-  //   setSelectedCat("locations");
-  //   getLocations();
-  // } else if (value === "classes") {
-  //   setSelectedCat("classes");
-  //   getClasses();
-  // }else{
-  //   setSelectedCat("programs")
-  //   getPrograms();
-  // }
-  //   } else {
-  //     if (value === "programs") {
-  //       setSelectedCat("");
-  //     } else if (value === "instructors") {
-  //       setSelectedCat("");
-  //     } else if (value === "locations") {
-  //       setSelectedCat("");
-  //     } else if (value === "classes") {
-  //       setSelectedCat("");
-  //     }
-  //   }
-  // };
+  const navigate = useNavigate();
 
   return (
     <>
@@ -120,7 +91,7 @@ const Programs = () => {
         <div className="row">
           <div className="col-lg-3 col-md-5 col-sm-12 bg-white vh-100">
             <div className="p-3 py-5">
-              <SectionHeader label={"Search By"} className={"mb-2"} />
+              <SectionHeader label={"Filter By"} className={"mb-2"} />
 
               <div className="search mt-2">
                 {matchApi &&
@@ -142,8 +113,8 @@ const Programs = () => {
           <div className="col-lg-9 col-md-7 col-sm-12 p-5 mx-auto">
             <SectionHeader label={`All the available ${selectedCat}`} />
 
-            <div class="table-responsive">
-              <table class="table  mt-2 fw-9">
+            {/* <div class="table-responsive">
+              <table class="table p-2  mt-2 fw-9">
                 <thead>
                   <tr>
                     <th scope="col">#</th>
@@ -151,6 +122,7 @@ const Programs = () => {
                       <>
                         <th scope="col">Program</th>
                         <th scope="col">Description</th>
+                        <th></th>
                       </>
                     ) : selectedCat === "instructors" ? (
                       <>
@@ -191,17 +163,21 @@ const Programs = () => {
                     list?.map((listData, index) => {
                       return (
                         <>
-                          <tr key={index}>
+                          <tr key={index} style={{ cursor: "pointer" }}>
                             {selectedCat === "programs" ? (
                               <>
-                                <td>{index + 1}</td>
-                                <td
-                                  style={{ cursor: "pointer" }}
-                                  className="text-decoration-underline"
+                                <td >{index + 1}</td>
+                                <td onClick={()=>navigate(`/programs/${listData?.programId}/classes`, {state:{id:listData?.programId, name:listData?.name}})}
+                                  
                                 >
                                   {listData?.name}
                                 </td>
-                                <td>{listData?.description}</td>
+                                <td>
+                                  {
+                                    listData?.description?.length > 100 ? `${ listData?.description.substring(0, 80)} ....` :  listData?.description
+                                  }
+                                </td>
+                                <td style={{cursor:"pointer"}}   onClick={()=>navigate(`/programs/${listData?.programId}/classes`, {state:{id:listData?.programId, name:listData?.name}})}><FaEye /> <span className="text-decoration-underline">View Class</span> </td>
                               </>
                             ) : selectedCat === "instructors" ? (
                               <>
@@ -245,11 +221,177 @@ const Programs = () => {
                       <td colspan="4">
                         <EmptyMessage title={`${selectedCat}`} className="" />
                       </td>{" "}
-                      {/* <EmptyMessage title="preferences" className="w-100" /> */}
                     </tr>
                   )}
                 </tbody>
               </table>
+            </div> */}
+
+            <div className="listSection">
+              <div className="header"></div>
+              <div className="body">
+                {loading ? (
+                  <div class="d-flex justify-content-center ">
+                    <div class="spinner-border" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                ) : list?.length > 0 ? (
+                  list &&
+                  list?.map((listData, index) => {
+                    return (
+                      <>
+                        <div
+                          key={index}
+                          className="border-bottom fw-9"
+                          style={{ cursor: "pointer" }}
+                        >
+                          {selectedCat === "programs" ? (
+                            <>
+                              <EachList>
+                                <div>
+                                  <p
+                                    className="mb-0 fw-bold"
+                                    onClick={() =>
+                                      navigate(
+                                        `/programs/${listData?.programId}/classes`,
+                                        {
+                                          state: {
+                                            id: listData?.programId,
+                                            name: listData?.name,
+                                          },
+                                        }
+                                      )
+                                    }
+                                  >
+                                    {listData?.name}
+                                  </p>
+                                  <p className="text-muted mb-0 mt-2 fw-9">
+                                    {listData?.description?.length > 100
+                                      ? `${listData?.description.substring(
+                                          0,
+                                          80
+                                        )} ....`
+                                      : listData?.description}
+                                  </p>
+                                </div>
+
+                                <p
+                                  className="secondaryBtn"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() =>
+                                    navigate(
+                                      `/programs/${listData?.programId}/classes`,
+                                      {
+                                        state: {
+                                          id: listData?.programId,
+                                          name: listData?.name,
+                                        },
+                                      }
+                                    )
+                                  }
+                                >
+                                  <span className="">View All Class</span>{" "}
+                                </p>
+                              </EachList>
+                            </>
+                          ) : selectedCat === "instructors" ? (
+                            <EachList>
+                              <div>
+                                <p className="fw-bold m-0">
+                                  {listData?.firstName +
+                                    " " +
+                                    listData?.lastName}
+                                </p>
+                                <p className="fw-9 text-muted">
+                                  {listData?.bio || "- -"}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="listHeading">Email</p>
+                                <p>{listData?.email}</p>
+                              </div>
+                              <div>
+                                <p className="listHeading">Phone</p>
+                                <p>{listData?.businessPhone || "- -"}</p>
+                              </div>
+                            </EachList>
+                          ) : selectedCat === "classes" ? (
+                            <EachList>
+                              <div>
+                                <p className="fw-bold m-0">
+                                  {listData?.program?.name}
+                                </p>
+                                <p className="fw-9">
+                                  {listData?.location?.name}
+                                </p>
+                              </div>
+
+                              <div className="fw-9">
+                                <p className="fw-bold m-0">
+                                  {" "}
+                                  {listData?.startTime &&
+                                    new Date(
+                                      listData?.startTime
+                                    )?.toLocaleDateString()}
+                                  {/* {listData?.endTime &&
+                                    new Date(
+                                      listData?.endTime
+                                    )?.toLocaleDateString()} */}
+                                </p>
+                                <p>
+                                  {" "}
+                                  {listData?.startTime &&
+                                    new Date(
+                                      listData?.startTime
+                                    )?.toLocaleTimeString()}{" "}
+                                  -
+                                  {listData?.endTime &&
+                                    new Date(
+                                      listData?.endTime
+                                    )?.toLocaleTimeString()}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="listHeading">Available Space</p>
+                                <p>{listData?.totalCapacity}</p>
+                              </div>
+                              <div>
+                                <p className="listHeading">Taught By</p>
+                                <p>
+                                  {listData?.instructor?.firstName +
+                                    " " +
+                                    listData?.instructor?.lastName}
+                                </p>
+                              </div>
+                            </EachList>
+                          ) : selectedCat === "locations" ? (
+                            <EachList>
+                              <div>
+                                <p className="m-0 fw-bold">{listData?.name}</p>
+                                <p className="align-self-start text-muted">
+                                  {listData?.description}
+                                </p>
+                              </div>
+                              <p className="fw-bold fw-9">
+                                {listData?.roomSize} sq feet
+                              </p>
+                            </EachList>
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      </>
+                    );
+                  })
+                ) : (
+                  <tr className=" text-center">
+                    <td colspan="4">
+                      <EmptyMessage title={`${selectedCat}`} className="" />
+                    </td>{" "}
+                  </tr>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -259,3 +401,11 @@ const Programs = () => {
 };
 
 export default Programs;
+
+export const EachList = ({ children }) => {
+  return (
+    <div className="bg-white d-flex justify-content-between align-items-center p-3">
+      {children}
+    </div>
+  );
+};
