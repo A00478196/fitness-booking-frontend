@@ -6,15 +6,7 @@ const Button = (props) => {
     <>
     <button onClick={onClick} disabled={disabled} className={`btn px-4 rounded-0  ${className} bg-${color} text-${textColor} ` }>
       {text}
-    
-    {
-      disabled &&
-    
-      <div class="spinner-border spinner-border-sm" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      }
-
+ 
 </button>
     </>
   )

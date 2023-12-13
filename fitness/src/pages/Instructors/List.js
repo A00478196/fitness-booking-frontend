@@ -4,8 +4,9 @@ import Container from "../../components/Container";
 import SectionHeader from "../../components/common/SectionHeader";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/common/Button";
-import { userDetail } from "../../components/helpers/common";
+import { loggedUser, userDetail } from "../../components/helpers/common";
 import EmptyMessage from "../../components/common/EmptyMessage";
+import { EachList } from "../programs/Programs";
 
 const List = () => {
   const [loading, setLoading] = useState(false);
@@ -31,7 +32,7 @@ const List = () => {
     <>
       <Container>
         <div className="row">
-          <div className="col-lg-8 col-md-8 col-sm-12 mx-auto">
+          <div className="col-lg-9 col-md-8 col-sm-12 mx-auto">
             <div className="d-flex justify-content-between align-items-center mb-2">
               <SectionHeader label={"Your classes"} />
               <Button
@@ -44,7 +45,7 @@ const List = () => {
               />
             </div>
 
-            <div class="table-responsive">
+            {/* <div class="table-responsive">
               <table class="table  mt-2 fw-9">
                 <thead>
                   <tr>
@@ -53,7 +54,6 @@ const List = () => {
                     <th scope="col">Seats Available</th>
                     <th scope="col">Class Time</th>
                     <th scope="col">Location</th>
-                    {/* <td scope="col"></td> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -68,7 +68,6 @@ const List = () => {
                   ) : allClasses?.length > 0 ? (
                     allClasses &&
                     allClasses?.map((clas, index) => {
-                      //   console.log(clas);
                       return (
                         <>
                           <tr key={index}>
@@ -79,7 +78,7 @@ const List = () => {
                             >
                               {clas?.program?.name}
                             </td>
-                            <td>{clas?.availableSpace}</td>
+                            <td>{clas?.totalCapacity}</td>
                             <td>
                               <div>
                                 <p>
@@ -117,9 +116,103 @@ const List = () => {
                   )}
                 </tbody>
               </table>
+            </div> */}
+
+            <div className="listSection">
+              <div className="header"></div>
+              <div className="body">
+                {loading ? (
+                  <div class="d-flex justify-content-center ">
+                    <div class="spinner-border" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                ) : allClasses?.length > 0 ? (
+                  allClasses &&
+                  allClasses?.map((listData, index) => {
+                    return (
+                      <>
+                        <div
+                          key={index}
+                          className="border-bottom fw-9"
+                          style={{ cursor: "pointer" }}
+                        >
+                          <EachList>
+                            <div>
+                              <p className="fw-bold">
+                                {listData?.program?.name}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="listHeading">Physical Class</p>
+                              <p className="fw-9">{listData?.location?.name}</p>
+                            </div>
+                            <div className="fw-9">
+                              <p className="fw-bold m-0 ">
+                                {" "}
+                                {listData?.startTime &&
+                                  new Date(
+                                    listData?.startTime
+                                  )?.toLocaleDateString()}
+                                {/* {listData?.endTime &&
+                                    new Date(
+                                      listData?.endTime
+                                    )?.toLocaleDateString()} */}
+                              </p>
+                              <p>
+                                {" "}
+                                {listData?.startTime &&
+                                  new Date(
+                                    listData?.startTime
+                                  )?.toLocaleTimeString()}{" "}
+                                -{" "}
+                                {listData?.endTime &&
+                                  new Date(
+                                    listData?.endTime
+                                  )?.toLocaleTimeString()}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="listHeading">Available Space</p>
+                              <p>{listData?.totalCapacity}</p>
+                            </div>
+                            {loggedUser === "instructor" && (
+                              <div
+                                className="secondaryBtn"
+                                style={{ cursor: "pointer" }}
+                                onClick={() =>
+                                  navigate(
+                                    `/classes/view/${listData?.classId}`,
+                                    {
+                                      state: {
+                                        id: listData?.classId,
+                                        registered: false,
+                                      },
+                                    }
+                                  )
+                                }
+                              >
+                                View Details
+                              </div>
+                            )}
+                          </EachList>
+                        </div>
+                      </>
+                    );
+                  })
+                ) : (
+                  <tr className=" text-center">
+                    <td colspan="4">
+                      <EmptyMessage title={`classes`} className="" />
+                    </td>{" "}
+                  </tr>
+                )}
+              </div>
             </div>
           </div>
         </div>
+
+       
       </Container>
     </>
   );

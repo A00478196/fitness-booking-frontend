@@ -59,15 +59,17 @@ const Navbar = () => {
                   Home
                 </NavLink>
               </li>
-              <li className="nav-item">
-                <NavLink
-                  to="/programs"
-                  activeClassName="selected"
-                  className={"nav-link"}
-                >
-                  Programs
-                </NavLink>
-              </li>
+              {loggedUser === "others" && (
+                <li className="nav-item">
+                  <NavLink
+                    to="/programs"
+                    activeClassName="selected"
+                    className={"nav-link"}
+                  >
+                    Programs
+                  </NavLink>
+                </li>
+              )}
               {loggedUser === "other" && (
                 <li className="nav-item">
                   <NavLink to="/classes/view" className={"nav-link"}>
