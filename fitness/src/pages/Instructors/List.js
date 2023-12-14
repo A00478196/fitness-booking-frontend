@@ -179,6 +179,13 @@ const List = () => {
                               <p className="listHeading">Total Capacity</p>
                               <p>{listData?.totalCapacity}</p>
                             </div>
+
+                            {loggedUser === "instructor" &&
+                            <div>
+                              <p className="listHeading">Users registered</p>
+                              <p>{listData?.persons?.length}</p>
+                            </div>
+                            }
                             {loggedUser === "instructor" && (
                               <div className="d-flex flex-column">
                               <div
