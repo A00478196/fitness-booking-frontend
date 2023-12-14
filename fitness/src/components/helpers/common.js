@@ -9,18 +9,18 @@ export const loggedUser = localStorage?.getItem("user")
 export const userDetail = localStorage?.getItem("userDetails")
 
 export const returnTimeOut = (setMessage) =>{
-    return setTimeout(()=>{
-        setMessage({
-          success:false,
-          error:false,
-          message:""
-        })
-      },[6000])
+    return setMessage({
+        success:false,
+        error:false,
+        message:""
+      })
+    // return setTimeout(()=>{
+        
+    //   },[6000])
 }
 
 export const validateForm = (data, setFormErrors)=>{
   let errors={}
-  console.log(data)
   if(data){
       Object.keys(data)?.map((formD)=>{
           let key = formD

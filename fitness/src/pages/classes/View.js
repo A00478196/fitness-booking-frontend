@@ -120,6 +120,16 @@ const View = () => {
                     <h6 className="fw-9 mb-0">{classDetail?.location?.name}</h6>
                   </div>
                 </div>
+
+                {loggedUser === "instructor" && (
+                  <div class="card border-0 ms-3">
+                    <div class="card-body">
+                      <h6 className="card-title fw-bold fw-9">Users Registered</h6>
+
+                      <h6 className="fw-9 mb-0">{classDetail?.persons?.length}</h6>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="register mt-3">

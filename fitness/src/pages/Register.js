@@ -13,6 +13,7 @@ const Register = () => {
   const [qualifications, setQualifications] = useState([]);
   const [data, setData] = useState({});
   const [formErrors, setFormErrors] = useState({});
+  const [fieldError, setFielErrors] = useState({});
 
   const [message, setMessage] = useState({
     success: false,
@@ -42,7 +43,10 @@ const Register = () => {
     const { name, value } = e?.target;
     let formData = { ...data };
     formData[name] = value;
+    fieldError[name] = "";
+    setFielErrors({});
     setData(formData);
+   
     setFormErrors({ error: "" });
   };
 
@@ -51,13 +55,38 @@ const Register = () => {
 
     let formData = { ...data };
 
-    formData["programs"] = [{
-      programId: parseInt(formData?.programId),
-    }];
+    formData["programs"] = [
+      {
+        programId: parseInt(formData?.programId),
+      },
+    ];
+
+    let testData = {};
+
+    if (isInstructor) {
+      testData = {
+        fistName: formData?.firstName,
+        email: formData?.email,
+        username: formData?.username,
+        password: formData?.password,
+        bio: formData?.bio,
+        businessPhone: formData?.businessPhone,
+        programs:formData?.programs?.length>0?formData?.programs:""
+      };
+    } else {
+      testData = {
+        firstName: formData?.firstName,
+        email: formData?.email,
+        username: formData?.username,
+        password: formData?.password,
+      };
+    }
+
     delete formData?.programId;
 
-    if (data && Object.keys(data)?.length > 0) {
-      instance
+    if (data && Object.keys(testData)?.length > 0) {
+      if (validateForm(testData, setFielErrors)) {
+        instance
         .post("/data/instructors", formData)
         .then((res) => {
           setMessage({
@@ -75,6 +104,8 @@ const Register = () => {
           });
           console.log(err);
         });
+      } else {
+      }
     } else {
       setFormErrors({ error: "All the fields are required" });
     }
@@ -109,6 +140,9 @@ const Register = () => {
                       onChange={onChange}
                     />
                   </div>
+                  {fieldError?.firstName && (
+                    <p className="text-danger">{fieldError?.firstName}</p>
+                  )}
 
                   <div className="col-lg-6">
                     <Input
@@ -120,9 +154,6 @@ const Register = () => {
                       onChange={onChange}
                       value={data?.lastName}
                     />
-                    {/* {formErrors?.lastName && (
-                    <ErrorMessage message={formErrors?.lastName} />
-                  )} */}
                   </div>
                 </div>
                 <div className="col-lg-6">
@@ -135,9 +166,9 @@ const Register = () => {
                     value={data?.username}
                     onChange={onChange}
                   />
-                  {/* {formErrors?.email && (
-                    <ErrorMessage message={formErrors?.email} />
-                  )} */}
+                  {fieldError?.username && (
+                    <p className="text-danger">Username is required</p>
+                  )}
                 </div>
                 <div className="row">
                   <div className="col-lg-6">
@@ -150,9 +181,9 @@ const Register = () => {
                       value={data?.email}
                       onChange={onChange}
                     />
-                    {/* {formErrors?.email && (
-                    <ErrorMessage message={formErrors?.email} />
-                  )} */}
+                    {fieldError?.email && (
+                      <p className="text-danger">Email is required</p>
+                    )}
                   </div>
 
                   <div className="col-lg-6">
@@ -165,9 +196,9 @@ const Register = () => {
                       value={data?.password}
                       onChange={onChange}
                     />
-                    {/* {formErrors?.email && (
-                    <ErrorMessage message={formErrors?.email} />
-                  )} */}
+                    {fieldError?.password && (
+                      <p className="text-danger">Password is required</p>
+                    )}
                   </div>
                 </div>
 
@@ -197,9 +228,9 @@ const Register = () => {
                           value={data?.bio}
                           onChange={onChange}
                         />
-                        {/* {formErrors?.email && (
-                    <ErrorMessage message={formErrors?.email} />
-                  )} */}
+                        {fieldError?.bio && (
+                          <p className="text-danger">Bio is required</p>
+                        )}
                       </div>
 
                       <div className="col-lg-6">
@@ -212,9 +243,11 @@ const Register = () => {
                           value={data?.businessPhone}
                           onChange={onChange}
                         />
-                        {/* {formErrors?.mobile && (
-                      <ErrorMessage message={formErrors?.mobile} />
-                    )} */}
+                        {fieldError?.businessPhone && (
+                          <p className="text-danger">
+                            Business Phone is required
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -229,6 +262,9 @@ const Register = () => {
                           name="programId"
                         />
                       </div>
+                      {fieldError?.programs && (
+                      <p className="text-danger">Programs are required</p>
+                    )}
                     </div>
                   </>
                 )}

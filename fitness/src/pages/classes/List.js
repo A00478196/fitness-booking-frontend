@@ -213,7 +213,7 @@ const List = () => {
                               </p>
                             </div>
                             <div>
-                              <p className="listHeading">Available Space</p>
+                              <p className="listHeading">Total Capacity</p>
                               <p>{listData?.totalCapacity}</p>
                             </div>
                             <div>
