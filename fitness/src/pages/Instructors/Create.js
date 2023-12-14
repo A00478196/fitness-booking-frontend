@@ -11,6 +11,7 @@ import Message from "../../components/common/Message";
 const Create = () => {
   const [locations, setLocations] = useState([]);
   const [programs, setPrograms] = useState([]);
+  const [userPrograms, setUserPrograms] = useState([]);
   const [data, setData] = useState({});
   const [message, setMessage] = useState({
     success: false,
@@ -24,7 +25,10 @@ const Create = () => {
     instance
       .get(`data/instructors/${detail?.id}`)
       .then((res) => {
-        console.log(res);
+        const unique = [
+          ...new Map(res?.data?.programs.map((m) => [m.programId, m])).values(),
+        ];
+        setUserPrograms(unique);
       })
       .catch((err) => {
         console.log(err);
@@ -85,33 +89,42 @@ const Create = () => {
     delete formData?.locationId;
     delete formData?.programId;
 
-    // formData['instructorId'] = parseInt(detail?.id)
-    // formData['programId'] = parseInt(formData?.programId)
-    // formData['locationId'] = parseInt(formData?.locationId)
     formData["totalCapacity"] = parseInt(formData?.totalCapacity);
 
-    instance
-      .post("data/classes", formData)
-      .then((res) => {
-        // console.log(res)
-        setTimeout(() => {
-          navigate("/instructors/class");
-          // window?.location?.reload()
-        }, [1000]);
-        setMessage({
-          success: true,
-          error: false,
-          message: "Class Created Successfully",
+    // console.log(formData)
+    const date1 = new Date(formData?.startTime);
+    const date2 = new Date(formData?.endTime);
+
+    if (date1 < date2) {
+      instance
+        .post("data/classes", formData)
+        .then((res) => {
+          // console.log(res)
+          setTimeout(() => {
+            navigate("/instructors/class");
+            // window?.location?.reload()
+          }, [1000]);
+          setMessage({
+            success: true,
+            error: false,
+            message: "Class Created Successfully",
+          });
+        })
+        .catch((err) => {
+          setMessage({
+            success: false,
+            error: true,
+            message: err?.response?.data?.errorMessage,
+          });
+          console.log(err);
         });
-      })
-      .catch((err) => {
-        setMessage({
-          success: false,
-          error: true,
-          message: err?.response?.data?.errorMessage,
-        });
-        console.log(err);
+    } else {
+      setMessage({
+        success: false,
+        error: true,
+        message: "Invalid Date Selection",
       });
+    }
 
     returnTimeOut(setMessage);
   };
@@ -133,8 +146,9 @@ const Create = () => {
                 <label class="form-label text-muted mb-0 text-capitalize fw-bold">
                   Select the Program
                 </label>
+
                 <Select
-                  options={programs}
+                  options={userPrograms}
                   name="programId"
                   onChange={onChange}
                 />
@@ -157,6 +171,7 @@ const Create = () => {
                 id="startTime"
                 label={true}
                 className="mt-2"
+                value={data?.startTime}
                 onChange={onChange}
               />
 
@@ -165,6 +180,7 @@ const Create = () => {
                 name="endTime"
                 id="endTime"
                 label={true}
+                value={data?.endTime}
                 onChange={onChange}
               />
 
@@ -173,20 +189,28 @@ const Create = () => {
                 name="totalCapacity"
                 id="totalCapacity"
                 label={true}
+                value={data?.totalCapacity}
                 onChange={onChange}
               />
 
-              <div className="mt-3">
-                <Button
-                  text="Create"
-                  type="main"
-                  className="mt-2"
-                  color="black"
-                  textColor="white"
-                  onClick={onSubmit}
-                  //   disabled={loading}
-                />
-              </div>
+              {userPrograms?.length !== 0 ? (
+                <div className="mt-3">
+                  <Button
+                    text="Create"
+                    type="main"
+                    className="mt-2"
+                    color="black"
+                    textColor="white"
+                    onClick={onSubmit}
+                    //   disabled={loading}
+                  />
+                </div>
+              ) : (
+                <p className="fst-italic fw-8 fw-bold mt-1 text-info">
+                  Note: You need to be qualified for at least one program to
+                  create a class
+                </p>
+              )}
             </form>
           </div>
         </div>

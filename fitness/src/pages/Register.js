@@ -51,9 +51,9 @@ const Register = () => {
 
     let formData = { ...data };
 
-    formData["program"] = {
+    formData["programs"] = [{
       programId: parseInt(formData?.programId),
-    };
+    }];
     delete formData?.programId;
 
     if (data && Object.keys(data)?.length > 0) {

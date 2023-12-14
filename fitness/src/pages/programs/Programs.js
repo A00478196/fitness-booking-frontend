@@ -6,12 +6,35 @@ import Checkbox from "../../components/common/Checkbox";
 import EmptyMessage from "../../components/common/EmptyMessage";
 import { useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
+import { loggedUser, userDetail } from "../../components/helpers/common";
 
 const Programs = () => {
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [selectedCat, setSelectedCat] = useState("");
+  const [qualification, setQualifications] = useState({
+    id: "",
+    qualified: false,
+  });
+  const [userPrograms, setUserPrograms] = useState([]);
+
+  let user = userDetail && JSON.parse(userDetail);
+
+  const getUserPrograms = () => {
+    instance
+      .get(`data/instructors/${user?.id}`)
+      .then((res) => {
+        console.log(res);
+        const unique = [
+          ...new Map(res?.data?.programs.map((m) => [m.programId, m])).values(),
+        ];
+        setUserPrograms(unique);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const getPrograms = () => {
     instance
@@ -20,8 +43,13 @@ const Programs = () => {
       .catch((err) => {
         console.log(err);
       });
+
+    if (loggedUser === "instructor") {
+      getUserPrograms();
+    }
   };
 
+  console.log("@userprograms", userPrograms);
   const getInstructors = () => {
     instance
       .get("data/instructors")
@@ -113,119 +141,7 @@ const Programs = () => {
           <div className="col-lg-9 col-md-7 col-sm-12 p-5 mx-auto">
             <SectionHeader label={`All the available ${selectedCat}`} />
 
-            {/* <div class="table-responsive">
-              <table class="table p-2  mt-2 fw-9">
-                <thead>
-                  <tr>
-                    <th scope="col">#</th>
-                    {selectedCat === "programs" ? (
-                      <>
-                        <th scope="col">Program</th>
-                        <th scope="col">Description</th>
-                        <th></th>
-                      </>
-                    ) : selectedCat === "instructors" ? (
-                      <>
-                        <th scope="col">Name</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Phone</th>
-                        <th scope="col">bio</th>
-                      </>
-                    ) : selectedCat === "classes" ? (
-                      <>
-                        <th scope="col">Name</th>
-                        <th scope="col">Start Date</th>
-                        <th scope="col">End Date</th>
-                        <th scope="col">Available Seats</th>
-                        <th scope="col">Taught By</th>
-                      </>
-                    ) : selectedCat === "locations" ? (
-                      <>
-                        <th scope="col">Name</th>
-                        <th scope="col">Description</th>
-                      </>
-                    ) : (
-                      ""
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <tr className="border">
-                      <div class="d-flex justify-content-center ">
-                        <div class="spinner-border" role="status">
-                          <span class="visually-hidden">Loading...</span>
-                        </div>
-                      </div>
-                    </tr>
-                  ) : list?.length > 0 ? (
-                    list &&
-                    list?.map((listData, index) => {
-                      return (
-                        <>
-                          <tr key={index} style={{ cursor: "pointer" }}>
-                            {selectedCat === "programs" ? (
-                              <>
-                                <td >{index + 1}</td>
-                                <td onClick={()=>navigate(`/programs/${listData?.programId}/classes`, {state:{id:listData?.programId, name:listData?.name}})}
-                                  
-                                >
-                                  {listData?.name}
-                                </td>
-                                <td>
-                                  {
-                                    listData?.description?.length > 100 ? `${ listData?.description.substring(0, 80)} ....` :  listData?.description
-                                  }
-                                </td>
-                                <td style={{cursor:"pointer"}}   onClick={()=>navigate(`/programs/${listData?.programId}/classes`, {state:{id:listData?.programId, name:listData?.name}})}><FaEye /> <span className="text-decoration-underline">View Class</span> </td>
-                              </>
-                            ) : selectedCat === "instructors" ? (
-                              <>
-                                <td>{index + 1}</td>
-                                <td>
-                                  {listData?.firstName +
-                                    " " +
-                                    listData?.lastName}
-                                </td>
-                                <td>{listData?.email}</td>
-                                <td>{listData?.businessPhone || "- -"}</td>
-
-                                <td>{listData?.bio || "- -"}</td>
-                              </>
-                            ) : (
-                              selectedCat==="classes"?
-                              <>
-                                <td>{index + 1}</td>
-                                <td>{listData?.program?.name}</td>
-                                <td>{listData?.startTime && new Date(listData?.startTime)?.toLocaleString()}</td>
-                                <td>{listData?.endTime && new Date(listData?.endTime)?.toLocaleString()}</td>
-                                <td>{listData?.totalCapacity}</td>
-                                <td>{listData?.instructor?.firstName + " " +listData?.instructor?.lastName}</td>
-                              </>
-                              :
-                              selectedCat==='locations'?
-                              <>
-                              <td>{index + 1}</td>
-                              <td>{listData?.name}</td>
-                              <td>{listData?.description}</td>
-                              </>
-                              :
-                              ''
-                            )}
-                          </tr>
-                        </>
-                      );
-                    })
-                  ) : (
-                    <tr className=" text-center">
-                      <td colspan="4">
-                        <EmptyMessage title={`${selectedCat}`} className="" />
-                      </td>{" "}
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div> */}
+        
 
             <div className="listSection">
               <div className="header"></div>
@@ -276,6 +192,18 @@ const Programs = () => {
                                   </p>
                                 </div>
 
+                                <div>
+                                  {loggedUser === "instructor" &&
+                                  userPrograms?.filter(
+                                    (e) => e.programId === listData?.programId
+                                  ).length > 0 ? (
+                                    <span class="badge bg-danger">
+                                      Qualified
+                                    </span>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
                                 <p
                                   className="secondaryBtn"
                                   style={{ cursor: "pointer" }}
@@ -286,6 +214,14 @@ const Programs = () => {
                                         state: {
                                           id: listData?.programId,
                                           name: listData?.name,
+                                          qualified:
+                                            userPrograms?.filter(
+                                              (e) =>
+                                                e.programId ===
+                                                listData?.programId
+                                            ).length > 0
+                                              ? true
+                                              : false,
                                         },
                                       }
                                     )

@@ -8,12 +8,14 @@ import { FaEye } from "react-icons/fa";
 import { EachList } from "./Programs";
 import { loggedUser, userDetail } from "../../components/helpers/common";
 import Button from "../../components/common/Button";
+import Input from "../../components/common/Input";
 
 const Classes = () => {
   const location = useLocation();
   const program = location?.state;
   const [programClasses, setProgramClasses] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [bio, setBio] = useState("")
 
   let user = userDetail && JSON.parse(userDetail);
 
@@ -34,73 +36,77 @@ const Classes = () => {
 
   const navigate = useNavigate();
 
+  const qualify = (e) => {
+    e.preventDefault();
+    // if(bio!==""){
+    instance
+      .put(`data/instructors/${user?.id}`, {
+        // bio:bio,
+        programs: [
+          {
+            programId: program?.id,
+          },
+        ],
+      })
+      .then((res) => {
+        navigate('/programs')
+        window?.location?.reload();
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    // }
+  };
+
   return (
     <>
       <Container>
         <div className="row">
           <div className="col-lg-9 col-md-8 col-sm-12 mx-auto">
-            <SectionHeader label={`All Classes offered for `} />{" "}
-            <span className="fw-9 headingName">{program?.name}</span>
-            <Button text="Qualify for this program"/>
-            {/* <div class="table-responsive">
-              <table class="table table-bordered  mt-2 fw-9">
-                <thead>
-                  <tr>
-                    <th scope="col">#</th>
-
-                    <th scope="col">Date</th>
-                    <th scope="col">End Date</th>
-                    <th scope="col">Available Seats</th>
-                    <th scope="col">Taught By</th>
-                    <th scope="col"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <tr className="border">
-                      <div class="d-flex justify-content-center ">
-                        <div class="spinner-border" role="status">
-                          <span class="visually-hidden">Loading...</span>
-                        </div>
-                      </div>
-                    </tr>
-                  ) : programClasses?.length > 0 ? (
-                    programClasses &&
-                    programClasses?.map((clas, index) => {
-                      return (
-                        <>
-                          <tr key={index}>
-                            <td>{index+1}</td>
-                            <td>
-                              {clas?.startTime &&
-                                new Date(clas?.startTime)?.toLocaleString()}
-                            </td>
-                            <td>
-                              {clas?.endTime &&
-                                new Date(clas?.endTime)?.toLocaleString()}
-                            </td>
-
-                            <td>{clas?.totalCapacity}</td>
-                            <td>{clas?.instructor?.firstName}</td>
-                            <td style={{cursor:"pointer"}}   onClick={() =>
-                              navigate(`/classes/view/${clas?.classId}`, {
-                                state: clas?.classId,
-                              })
-                            }><FaEye /> <span className="text-decoration-underline">View</span> </td>
-                          </tr>
-                        </>
-                      );
-                    })
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <SectionHeader label={`All Classes offered for `} />{" "}
+                <span className="fw-9 headingName">{program?.name}</span>
+                {loggedUser === "instructor" &&
+                  (program?.qualified ? (
+                    <span
+                      style={{ width: "fit-content" }}
+                      class="my-3 d-block badge bg-danger"
+                    >
+                      Qualified
+                    </span>
                   ) : (
-                    <tr className="border text-center">
-                        <td colspan="6">
-                        <EmptyMessage title="classes" className="" />
-                      </td>{" "}
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div> */}
+                    <button
+                      // onClick={qualify}
+                      className="d-block my-3 py-2 px-1"
+                      color="black"
+                      textColor="white"
+                      data-bs-toggle="modal"
+                      data-bs-target="#qualifyModal"
+                    >
+                      Qualify for this program
+                    </button>
+                  ))}
+              </div>
+
+              <div>
+                {
+                  loggedUser==="instructor" && program?.qualified &&
+
+                  <Button
+                  text="Create Class"
+                  type="main"
+                  className="mt-2"
+                  color="black"
+                  textColor="white"
+                  onClick={()=>navigate('/instructors/class/new')}
+                  //   disabled={loading}
+                />
+                }
+              </div>
+            </div>
+
             <div className="listSection">
               <div className="header"></div>
               <div className="body">
@@ -113,12 +119,30 @@ const Classes = () => {
                 ) : programClasses?.length > 0 ? (
                   programClasses &&
                   programClasses?.map((listData, index) => {
+                    console.log(listData?.persons)
+                    console.log(user)
                     return (
                       <>
                         <div
                           key={index}
                           className="border-bottom fw-9"
                           style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            navigate(
+                              `/classes/view/${listData?.classId}`,
+                              {
+                                state: {
+                                  id: listData?.classId,
+                                  registered:
+                                    listData?.persons.filter(
+                                      (e) => e.personId === user?.id
+                                    ).length > 0
+                                      ? true
+                                      : false,
+                                },
+                              }
+                            )
+                          }
                         >
                           <EachList>
                             <div>
@@ -165,7 +189,7 @@ const Classes = () => {
                                   listData?.instructor?.lastName}
                               </p>
                             </div>
-                            {loggedUser === "others" && (
+                            {/* {loggedUser === "others" && (
                               <div
                                 onClick={() =>
                                   navigate(
@@ -184,19 +208,9 @@ const Classes = () => {
                                   )
                                 }
                               >
-                                {listData?.persons.filter(
-                                  (e) => e.personId === user?.id
-                                ).length > 0 ? (
-                                  <span class="badge bg-warning text-dark p-1 py-2">
-                                    Registered
-                                  </span>
-                                ) : (
-                                  <span class="badge bg-dark p-1 py-2">
-                                    Register Now
-                                  </span>
-                                )}
+                                
                               </div>
-                            )}
+                            )} */}
                           </EachList>
                         </div>
                       </>
@@ -209,6 +223,56 @@ const Classes = () => {
                     </td>{" "}
                   </tr>
                 )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="modal fade"
+          id="qualifyModal"
+          tabindex="-1"
+          aria-labelledby="qualifyModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                  Qualification
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to qualify for this program?
+
+              {/* <Input
+                          type="text"
+                          id="bio"
+                          name="bio"
+                          label={true}
+                          placeholder="Enter your Bio"
+                          value={bio}
+                          onChange={(e)=>{setBio(e?.target?.value)}}
+                        /> */}
+
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button type="button" class="btn btn-danger" onClick={qualify}>
+                  Qualify
+                </button>
               </div>
             </div>
           </div>
