@@ -247,6 +247,17 @@ const Programs = () => {
                                 <p className="listHeading">Email</p>
                                 <p>{listData?.email}</p>
                               </div>
+                              {/* <div>
+                                <p className="listHeading">Qualifications</p>
+                                <div className="d-flex">
+                                {
+                                  listData?.programs?.length>0 && listData?.programs?.map((program, index)=>{
+                                    return <p className="ms-1">{program?.name},</p>
+                                  })
+                                }
+                                </div>
+                                
+                              </div> */}
                               <div>
                                 <p className="listHeading">Phone</p>
                                 <p>{listData?.businessPhone || "- -"}</p>

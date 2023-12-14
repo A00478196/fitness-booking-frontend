@@ -59,6 +59,8 @@ const Create = () => {
       .catch((err) => {
         console.log(err);
       });
+
+
   }, []);
 
   const onChange = (e) => {
@@ -96,6 +98,7 @@ const Create = () => {
     const date2 = new Date(formData?.endTime);
 
     if (date1 < date2) {
+      console.log(formData)
       instance
         .post("data/classes", formData)
         .then((res) => {
@@ -124,9 +127,11 @@ const Create = () => {
         error: true,
         message: "Invalid Date Selection",
       });
+      console.log(message)
+
     }
 
-    returnTimeOut(setMessage);
+    // returnTimeOut(setMessage);
   };
 
   return (

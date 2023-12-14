@@ -46,7 +46,7 @@ const Register = () => {
     fieldError[name] = "";
     setFielErrors({});
     setData(formData);
-   
+
     setFormErrors({ error: "" });
   };
 
@@ -65,13 +65,13 @@ const Register = () => {
 
     if (isInstructor) {
       testData = {
-        fistName: formData?.firstName,
+        firstName: formData?.firstName,
         email: formData?.email,
         username: formData?.username,
         password: formData?.password,
         bio: formData?.bio,
         businessPhone: formData?.businessPhone,
-        programs:formData?.programs?.length>0?formData?.programs:""
+        programs: formData?.programs?.length > 0 ? formData?.programs : "",
       };
     } else {
       testData = {
@@ -87,30 +87,30 @@ const Register = () => {
     if (data && Object.keys(testData)?.length > 0) {
       if (validateForm(testData, setFielErrors)) {
         instance
-        .post("/data/instructors", formData)
-        .then((res) => {
-          setMessage({
-            success: true,
-            error: false,
-            message: "User registered Successfully!",
+          .post("/data/instructors", testData)
+          .then((res) => {
+            setMessage({
+              success: true,
+              error: false,
+              message: "User registered Successfully!",
+            });
+            console.log(res);
+          })
+          .catch((err) => {
+            setMessage({
+              success: false,
+              error: true,
+              message: err?.response?.data?.errorMessage,
+            });
+            console.log(err);
           });
-          console.log(res);
-        })
-        .catch((err) => {
-          setMessage({
-            success: false,
-            error: true,
-            message: err?.response?.data?.errorMessage,
-          });
-          console.log(err);
-        });
       } else {
       }
     } else {
       setFormErrors({ error: "All the fields are required" });
     }
 
-    returnTimeOut(setMessage);
+    // returnTimeOut(setMessage);
   };
 
   return (
@@ -263,8 +263,8 @@ const Register = () => {
                         />
                       </div>
                       {fieldError?.programs && (
-                      <p className="text-danger">Programs are required</p>
-                    )}
+                        <p className="text-danger">Programs are required</p>
+                      )}
                     </div>
                   </>
                 )}
